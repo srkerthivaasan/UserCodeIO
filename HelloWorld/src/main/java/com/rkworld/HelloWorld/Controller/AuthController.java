@@ -3,8 +3,9 @@ package com.rkworld.HelloWorld.Controller;
 import com.rkworld.HelloWorld.Entity.User;
 import com.rkworld.HelloWorld.Repository.UserRepository;
 import com.rkworld.HelloWorld.Service.UserService;
-import com.rkworld.HelloWorld.Utils.JwtUtil;
+import com.rkworld.HelloWorld.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,10 +21,13 @@ import java.util.Map;
 @RequestMapping("/auth")
 public class AuthController {
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     private final UserService userService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
+
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody Map<String, String> user) {
