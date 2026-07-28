@@ -1,7 +1,11 @@
-package com.rkworld.HelloWorld;
+package com.rkworld.HelloWorld.Controller;
 
 import com.rkworld.HelloWorld.Entity.Todo;
+import com.rkworld.HelloWorld.Service.TodoService;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +25,10 @@ public class TodoController {
     }
 
     //PathVaraiable
+    @ApiResponses(value = {
+            @ApiResponse(responseCode ="200",description = "Todo Retrieved Successfully"),
+            @ApiResponse(responseCode ="404" ,description="Todo was not Found")
+    })
     @GetMapping("/{id}")
     ResponseEntity<Todo> getTodoById(@PathVariable long id){
         try{
@@ -31,7 +39,12 @@ public class TodoController {
         }
     }
 
-    @GetMapping("")
+    @GetMapping("/page")
+    ResponseEntity<Page<Todo>>getTodosPaged(@RequestParam int page, @RequestParam int size){
+        return new ResponseEntity<>(todoService.getAllTodosPages(page,size),HttpStatus.OK);
+    }
+
+    @GetMapping
     ResponseEntity<List<Todo>> getTodos(){
         return new ResponseEntity<List<Todo>>(todoService.getTodos(),HttpStatus.OK);
     }
