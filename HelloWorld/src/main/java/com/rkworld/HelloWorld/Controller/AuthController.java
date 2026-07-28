@@ -28,35 +28,31 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody Map<String, String> user) {
         String email = user.get("email");
-        String password = user.get("password");
-
+        String rawPassword = user.get("password");
         if (userRepository.findByEmail(email).isPresent()) {
             return new ResponseEntity<>("Email Already Exists", HttpStatus.CONFLICT);
         }
+        String encodedPassword = passwordEncoder.encode(rawPassword);
 
-        userService.createUser(User.builder().email(email).password(password).build());
-
+        userService.createUser(User.builder()
+                .email(email)
+                .password(encodedPassword)
+                .build());
         return new ResponseEntity<>("Successfully Registered", HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody Map<String, String> user) {
         String email = user.get("email");
-        String password = user.get("password");
-        password = passwordEncoder.encode(password);
-
+        String rawPassword = user.get("password"); // Keep as raw text!
         var userOptional = userRepository.findByEmail(email);
-
         if (userOptional.isEmpty()) {
             return new ResponseEntity<>("User Not Registered", HttpStatus.UNAUTHORIZED);
         }
-
         User userEntity = userOptional.get();
-
-        if (!passwordEncoder.matches(password, userEntity.getPassword())) {
+        if (!passwordEncoder.matches(rawPassword, userEntity.getPassword())) {
             return new ResponseEntity<>("Invalid Password", HttpStatus.UNAUTHORIZED);
         }
-
         String token = jwtUtil.generateToken(email);
         return ResponseEntity.ok(Map.of("token", token));
     }
