@@ -43,6 +43,7 @@ public class AuthController {
     public ResponseEntity<?> loginUser(@RequestBody Map<String, String> user) {
         String email = user.get("email");
         String password = user.get("password");
+        password = passwordEncoder.encode(password);
 
         var userOptional = userRepository.findByEmail(email);
 
